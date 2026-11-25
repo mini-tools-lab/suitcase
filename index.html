@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:,">
+<title>スーツケースサイズ診断ツール｜何泊の旅行に何リットル？機内持ち込み判定つき</title>
+<meta name="description" content="旅行の日数・季節・お土産の量を選ぶだけで、スーツケースのぴったりの容量（リットル）がわかります。手持ちのスーツケースの3辺を入れれば、機内持ち込みできるか・預け入れのサイズ内かも判定。登録不要・無料。">
+<link rel="canonical" href="https://mini-tools-lab.github.io/suitcase/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:site_name" content="スーツケースサイズ診断ツール">
+<meta property="og:title" content="スーツケースサイズ診断ツール｜何泊の旅行に何リットル？機内持ち込み判定つき">
+<meta property="og:description" content="何泊の旅行に何リットルのスーツケースが合うか診断。手持ちのスーツケースが機内に持ち込めるかも3辺から判定できます。登録不要・無料。">
+<meta property="og:url" content="https://mini-tools-lab.github.io/suitcase/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="スーツケースサイズ診断ツール">
+<meta name="twitter:description" content="何泊の旅行に何リットル？手持ちのスーツケースは機内に持ち込める？旅行の荷物のサイズ選びを診断できます。">
+<style>
+:root{
+--bg:#f4f7f8; --surface:#ffffff; --surface2:#e8f2f4; --text:#1f2a2e; --muted:#5b6b70; --line:#dbe6e8;
+--primary:#0e7490; --primary-dark:#155e75; --primary-soft:#e0f2f7; --accent:#dc2626; --accent-soft:#fdecec;
+--ok:#15803d; --radius:18px; --shadow:0 4px 24px rgba(14,60,80,.08);
+}
+@media (prefers-color-scheme: dark){
+:root{ --bg:#121a1c; --surface:#1c2629; --surface2:#243236; --text:#e8f1f2; --muted:#9db0b5; --line:#33454a; --primary:#22d3ee; --primary-dark:#22d3ee; --primary-soft:#12303a; --accent:#f87171; --accent-soft:#3d1f1a; --shadow:0 4px 24px rgba(0,0,0,.35);}
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic UI","Yu Gothic",Meiryo,sans-serif;line-height:1.6}
+button,input,select{font:inherit;min-height:44px}
+h1,h2{font-family:"Hiragino Maru Gothic ProN","Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic",Meiryo,sans-serif;font-weight:700;line-height:1.3;margin:0}
+.wrap{max-width:980px;margin:0 auto;padding:20px 16px 48px}
+.hero{padding:8px 2px 18px}
+.hero h1{font-size:32px;font-weight:900;letter-spacing:.02em}
+.hero h1 span{color:var(--primary)}
+.hero p{color:var(--muted);margin:8px 0 0;font-size:15px;max-width:640px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+.card h2{font-size:18px;display:flex;align-items:center;gap:8px}
+.num{width:28px;height:28px;border-radius:50%;background:var(--primary-soft);color:var(--primary);display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.hint{font-size:13px;color:var(--muted);margin:6px 0 12px}
+.field{margin-bottom:14px}
+.field label{font-size:13px;font-weight:700;display:block;margin-bottom:5px}
+select,input{border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--surface);color:var(--text);width:100%}
+select:focus,input:focus{outline:2px solid var(--primary);outline-offset:1px;border-color:transparent}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:760px){.grid{grid-template-columns:1fr}}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:center}
+th{background:var(--surface2)}
+td:first-child,th:first-child{text-align:left;font-weight:700}
+.res{margin-top:6px;border-top:1px dashed var(--line);padding-top:10px}
+.res dl{margin:0}
+.res .row{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;font-size:14px}
+.res dt{color:var(--muted)}
+.res dd{margin:0;font-weight:700}
+.res .row.big{border-top:1px solid var(--line);margin-top:6px;padding-top:10px}
+.res .row.big dt{color:var(--text);font-weight:700;font-size:15px}
+.res .row.big dd{font-size:24px;font-weight:900;color:var(--primary)}
+.result{margin-top:16px;background:var(--primary);color:#fff;border-radius:20px;padding:22px;box-shadow:var(--shadow);text-align:center}
+@media(prefers-color-scheme:dark){.result{background:#0b4a5a}}
+.result .r-label{font-size:14px;font-weight:700;opacity:.95}
+.result .r-amount{font-size:34px;font-weight:900;line-height:1.3;margin:4px 0}
+.result .r-note{margin-top:12px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);border-radius:14px;padding:12px 14px;font-size:14px;text-align:left}
+.result.ng{background:#7f1d1d}
+@media(prefers-color-scheme:dark){.result.ng{background:#5b1a1a}}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.chip{border:1.5px solid var(--primary);color:var(--primary);border-radius:999px;padding:4px 12px;font-size:14px;font-weight:700;background:var(--surface)}
+.note{font-size:13px;color:var(--muted);margin-top:12px}
+.stack{margin-top:16px}
+footer{margin-top:28px;color:var(--muted);font-size:13px;text-align:center}
+footer a{color:var(--primary);font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="hero">
+<h1>スーツケース<span>サイズ診断</span>ツール</h1>
+<p>「何泊の旅行に、何リットルのスーツケース？」に、日数・季節・お土産の量から答えます。手持ちのスーツケースが機内に持ち込めるかどうかも、3辺のサイズから判定できます。</p>
+</header>
+
+<section class="card" aria-labelledby="diag-h">
+<h2 id="diag-h"><span class="num">1</span>旅行から選ぶ</h2>
+<p class="hint">容量の目安は「1泊あたり約10L」という、よく使われる目安を土台に、季節とお土産の分で調整しています。詳しくは<a href="guide.html">解説ページ</a>へ。</p>
+<div class="field">
+<label for="nights">宿泊数（泊）</label>
+<input id="nights" type="number" inputmode="numeric" min="1" max="30" step="1" value="3">
+</div>
+<div class="field">
+<label for="season">季節・行き先</label>
+<select id="season">
+<option value="summer">夏・リゾート（薄手の服中心）</option>
+<option value="normal" selected>春秋・ふつうの旅行</option>
+<option value="winter">冬・寒冷地（厚手の服がかさばる）</option>
+</select>
+</div>
+<div class="field">
+<label for="souvenir">お土産・荷物の量</label>
+<select id="souvenir">
+<option value="few">少なめ（お土産はほとんど買わない）</option>
+<option value="normal" selected>ふつう（お土産を少し買う）</option>
+<option value="many">多め（お土産をたくさん買う）</option>
+</select>
+</div>
+</section>
+
+<div class="result" id="result" aria-live="polite">
+<div class="r-label">おすすめの容量</div>
+<div class="r-amount" id="verdict">40〜55L</div>
+<div class="r-note" id="verdict-note">3泊・春秋・お土産ふつうの場合の目安です。Mサイズ（40〜60L級）がちょうどよく、機内持ち込みは小さめを選べばできる範囲です。</div>
+</div>
+
+<section class="card stack" aria-labelledby="detail-h">
+<h2 id="detail-h"><span class="num">2</span>容量の内訳</h2>
+<p class="hint">おすすめ容量の真ん中の値が、どう決まったかの内訳です。</p>
+<div class="res" aria-live="polite">
+<dl>
+<div class="row big"><dt>容量の目安（真ん中の値）</dt><dd id="midCap">45L</dd></div>
+<div class="row"><dt>基本の量（1泊あたり約10L）</dt><dd id="baseCap">40L</dd></div>
+<div class="row"><dt>季節の調整</dt><dd id="seasonAdj">±0L</dd></div>
+<div class="row"><dt>お土産の調整</dt><dd id="souvenirAdj">＋5L</dd></div>
+<div class="row"><dt>サイズの呼称の目安</dt><dd id="sizeCall">Mサイズ</dd></div>
+<div class="row"><dt>機内持ち込みの目安</dt><dd id="carryNote">小さめを選べば機内持ち込み可</dd></div>
+</dl>
+</div>
+<p class="note" id="detail-note">「1泊あたり10L」は、衣類・洗面用具・お土産スペースを含めた実用容量の目安です。現地で洗濯する予定なら、1サイズ小さめでも足りることがあります。</p>
+<h2 style="margin-top:16px">この範囲に入る、よくある容量</h2>
+<p class="hint">おすすめの範囲に入る容量です。店頭では「リットル」で比べるのが確実です。S・M・Lの呼称はメーカーで20L以上ちがうことがあります。</p>
+<div class="chips" id="sizes" aria-live="polite"><span class="chip">40L</span><span class="chip">50L</span></div>
+</section>
+
+<div class="grid stack">
+<section class="card" aria-labelledby="check-h">
+<h2 id="check-h">手持ちのスーツケースをチェック</h2>
+<p class="hint">キャスター・ハンドル・ポケットを含めた外側の寸法（cm）を入れてください。容量の概算と、機内持ち込み・預け入れの可否を判定します。</p>
+<div class="field">
+<label for="len">いちばん長い辺（cm）</label>
+<input id="len" type="number" inputmode="decimal" min="0" step="0.1" value="55">
+</div>
+<div class="field">
+<label for="wid">2番目に長い辺（cm）</label>
+<input id="wid" type="number" inputmode="decimal" min="0" step="0.1" value="40">
+</div>
+<div class="field">
+<label for="dep">いちばん短い辺（奥行き・cm）</label>
+<input id="dep" type="number" inputmode="decimal" min="0" step="0.1" value="20">
+</div>
+<div class="field">
+<label for="route">路線・航空会社の区分</label>
+<select id="route">
+<option value="large" selected>国内線・国際線の大手（ANA・JALなど、100席以上の機材）</option>
+<option value="small">国内線の小型機（100席未満・FDAなど）</option>
+<option value="peach">ピーチ（LCC）</option>
+<option value="jetstar">ジェットスター（LCC）</option>
+</select>
+</div>
+<div class="res" aria-live="polite">
+<dl>
+<div class="row big"><dt>容量の概算</dt><dd id="volResult">約39.6L</dd></div>
+<div class="row"><dt>3辺の合計</dt><dd id="sumResult">115cm</dd></div>
+<div class="row"><dt>機内持ち込み</dt><dd id="carryResult">持ち込めます</dd></div>
+<div class="row"><dt>受託手荷物（預け入れ）の目安</dt><dd id="checkinResult">国際線・国内線ともサイズ内です</dd></div>
+</dl>
+</div>
+<p class="note" id="check-note">重さの上限は、手荷物と身の回り品の合計で大手10kg・LCC7kgです。重さは別途量ってください。機内持ち込みのサイズは、各航空会社の最新の案内で搭乗前に確認してください。</p>
+</section>
+
+<section class="card" aria-labelledby="table-h">
+<h2 id="table-h">日数別の容量の目安表</h2>
+<p class="hint">診断の土台になっている目安です。季節とお土産の分で前後します。</p>
+<table>
+<tr><th>宿泊日数</th><th>容量の目安</th><th>呼称</th></tr>
+<tr><td>1泊</td><td>20〜30L</td><td>SSサイズ</td></tr>
+<tr><td>2〜3泊</td><td>30〜40L</td><td>Sサイズ</td></tr>
+<tr><td>3〜5泊</td><td>40〜60L</td><td>Mサイズ</td></tr>
+<tr><td>5〜7泊</td><td>60〜80L</td><td>M〜Lサイズ</td></tr>
+<tr><td>7〜10泊</td><td>80〜100L</td><td>Lサイズ</td></tr>
+<tr><td>10泊以上</td><td>100L以上</td><td>LLサイズ</td></tr>
+</table>
+<p class="note">※ 冬の寒冷地やお土産が多い旅は＋10〜20L、夏のリゾートは−10Lほどで調整しています。迷ったら1サイズ上が安心です。</p>
+</section>
+</div>
+
+<section class="card stack" aria-labelledby="about-h">
+<h2 id="about-h">このツールについて</h2>
+<p class="hint">スーツケースのサイズ選びでよく使われる「1泊あたり約10L」という目安に、季節とお土産の調整を加えて診断しています。機内持ち込みの判定は、ANA・JALなど国内線の手荷物ルール（100席以上の機材で3辺合計115cm以内かつ55×40×25cm以内、100席未満の機材で合計100cm以内かつ45×35×20cm以内）と、ピーチ（合計115cm以内）・ジェットスター（56×36×23cm以内）のルールにもとづいています。受託手荷物は、国際線の主流である合計158cm以内、国内線の合計203cm以内を目安にしています。あくまで目安です。航空会社の規定は変わることがあるため、搭乗前に各社の最新の案内を確認してください。</p>
+<p class="hint">入力した内容はどこにも送信されません。ブラウザの中だけで計算しています。</p>
+<p class="hint"><a href="guide.html">解説ページ：スーツケースのサイズの選び方と機内持ち込みのルール</a>では、目安の根拠やS・M・Lの呼称のちがい、3辺の正しい測り方をまとめています。</p>
+</section>
+
+<footer>
+<p>スーツケースサイズ診断ツール｜<a href="guide.html">解説ページ</a>｜容量・サイズは目安です。航空会社の最新の規定を確認してください。</p>
+</footer>
+</div>
+
+<script>
+"use strict";
+// === CALC LOGIC START ===
+// 季節の調整（L）。冬・寒冷地は厚手の服がかさばるため＋15L、夏・リゾートは−10L。
+var SEASON_ADJ = { summer: -10, normal: 0, winter: 15 };
+// お土産・荷物の量の調整（L）。
+var SOUVENIR_ADJ = { few: 0, normal: 5, many: 10 };
+// よく売られている容量（L）。
+var COMMON_SIZES = [20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 140];
+var MIN_LOW = 15, MAX_HIGH = 350;
+// 路線区分ごとの機内持ち込みルール。dims は長い辺から順の各辺の上限（cm）、
+// sum は3辺合計の上限（cm）、weight は手荷物＋身の回り品の合計の重さ上限。
+var ROUTES = {
+  large:   { label: "国内線・国際線の大手（100席以上）", dims: [55, 40, 25], sum: 115, weight: "10kg" },
+  small:   { label: "国内線の小型機（100席未満）", dims: [45, 35, 20], sum: 100, weight: "10kg" },
+  peach:   { label: "ピーチ（LCC）", dims: null, sum: 115, weight: "7kg" },
+  jetstar: { label: "ジェットスター（LCC）", dims: [56, 36, 23], sum: 115, weight: "7kg" }
+};
+
+function clamp(n, lo, hi){ return Math.min(hi, Math.max(lo, n)); }
+function round5(n){ return Math.round(n / 5) * 5; }
+
+// 旅行から容量を診断する。宿泊数・季節・お土産の量から推奨容量の範囲を返す。
+// 戻り値: { nights, base, seasonAdj, souvenirAdj, center, low, high, mid,
+//   sizeCall, sizeBand, carryNote, sizes[], notes[] }
+function diagnose(nights, seasonId, souvenirId){
+  nights = Math.floor(Number(nights));
+  if (!isFinite(nights)) nights = 3;
+  nights = clamp(nights, 1, 30);
+  var sAdj = SEASON_ADJ[seasonId]; if (sAdj === undefined) sAdj = 0;
+  var vAdj = SOUVENIR_ADJ[souvenirId]; if (vAdj === undefined) vAdj = 5;
+  var base = 10 + 10 * nights;
+  var center = base + sAdj + vAdj;
+  var low = Math.max(MIN_LOW, round5(center - 5));
+  var high = Math.min(MAX_HIGH, round5(center + 10));
+  if (low > high) { var t = low; low = high; high = t; }
+  var mid = clamp(round5(center), low, high);
+  var sizeCall, sizeBand;
+  if (center < 30)      { sizeCall = "SSサイズ"; sizeBand = "20〜30L級"; }
+  else if (center < 40) { sizeCall = "Sサイズ";  sizeBand = "30〜40L級"; }
+  else if (center < 60) { sizeCall = "Mサイズ";  sizeBand = "40〜60L級"; }
+  else if (center < 80) { sizeCall = "M〜Lサイズ"; sizeBand = "60〜80L級"; }
+  else if (center < 100){ sizeCall = "Lサイズ";  sizeBand = "80〜100L級"; }
+  else                  { sizeCall = "LLサイズ"; sizeBand = "100L以上"; }
+  var carryNote;
+  if (high <= 40) carryNote = "機内持ち込みできるサイズが中心です";
+  else if (low > 40) carryNote = "預け入れが基本です";
+  else carryNote = "小さめを選べば機内持ち込みできます";
+  var sizes = COMMON_SIZES.filter(function(s){ return s >= low && s <= high; });
+  if (sizes.length === 0) sizes = [nearestSize(mid)];
+  var notes = [];
+  if (nights >= 10) notes.push("10泊以上の長期旅行では、現地で洗濯する前提なら1サイズ小さめでも足りることがあります。");
+  if (seasonId === "winter") notes.push("冬物はかさばるため、ファスナーで広げられる「拡張」つきを選んでおくと安心です。");
+  if (high > 100) notes.push("100Lを超える大きさは、預け入れの重さ（国内線は20kg前後が目安）にも気をつけてください。");
+  return { nights: nights, base: base, seasonAdj: sAdj, souvenirAdj: vAdj,
+    center: center, low: low, high: high, mid: mid,
+    sizeCall: sizeCall, sizeBand: sizeBand, carryNote: carryNote, sizes: sizes, notes: notes };
+}
+function nearestSize(mid){
+  var best = COMMON_SIZES[0], bestDiff = Math.abs(mid - best);
+  for (var i = 1; i < COMMON_SIZES.length; i++){
+    var d = Math.abs(mid - COMMON_SIZES[i]);
+    if (d < bestDiff) { bestDiff = d; best = COMMON_SIZES[i]; }
+  }
+  return best;
+}
+// 手持ちのスーツケースをチェックする。3辺（cm）と路線区分から容量の概算と
+// 機内持ち込み・受託手荷物の可否を返す。不正入力は { valid: false }。
+// 戻り値: { valid, dims[3], sum, volumeL, carryOk, carryReasons[], checkin, routeLabel, weight }
+function checkBag(len, wid, dep, routeId){
+  var dims = [Number(len), Number(wid), Number(dep)];
+  for (var i = 0; i < 3; i++){
+    if (!isFinite(dims[i]) || dims[i] <= 0) return { valid: false };
+  }
+  dims.sort(function(a, b){ return b - a; });
+  var rule = ROUTES[routeId] || ROUTES.large;
+  var sum = Math.round((dims[0] + dims[1] + dims[2]) * 10) / 10;
+  // 外寸を直方体とみなした体積に、角の丸み・フレーム分として0.9を掛けた概算。
+  var volumeL = Math.round(dims[0] * dims[1] * dims[2] / 1000 * 0.9 * 10) / 10;
+  var reasons = [];
+  if (rule.dims){
+    if (dims[0] > rule.dims[0]) reasons.push("いちばん長い辺が" + rule.dims[0] + "cmを超えています");
+    if (dims[1] > rule.dims[1]) reasons.push("2番目に長い辺が" + rule.dims[1] + "cmを超えています");
+    if (dims[2] > rule.dims[2]) reasons.push("いちばん短い辺が" + rule.dims[2] + "cmを超えています");
+  }
+  if (sum > rule.sum) reasons.push("3辺の合計が" + rule.sum + "cmを超えています");
+  var carryOk = reasons.length === 0;
+  var checkin;
+  if (sum <= 158) checkin = "国際線・国内線ともサイズ内です";
+  else if (sum <= 203) checkin = "国内線はサイズ内ですが、国際線（158cm以内）では超過の可能性があります";
+  else checkin = "国内線（203cm以内）・国際線とも超過の可能性があります";
+  return { valid: true, dims: dims, sum: sum, volumeL: volumeL,
+    carryOk: carryOk, carryReasons: reasons, checkin: checkin,
+    routeLabel: rule.label, weight: rule.weight };
+}
+// === CALC LOGIC END ===
+
+function fmt(n){ return n.toLocaleString("ja-JP"); }
+function fmtSigned(n){ return (n > 0 ? "＋" : n < 0 ? "−" : "±") + fmt(Math.abs(n)) + "L"; }
+function val(id){ return document.getElementById(id).value; }
+function calc(){
+  var r = diagnose(val("nights"), val("season"), val("souvenir"));
+  document.getElementById("verdict").textContent = fmt(r.low) + "〜" + fmt(r.high) + "L";
+  var seasonLabel = { summer: "夏・リゾート", normal: "春秋", winter: "冬・寒冷地" }[val("season")] || "春秋";
+  var souvenirLabel = { few: "お土産少なめ", normal: "お土産ふつう", many: "お土産多め" }[val("souvenir")] || "お土産ふつう";
+  var note = r.nights + "泊・" + seasonLabel + "・" + souvenirLabel + "の場合の目安です。" +
+    r.sizeCall + "（" + r.sizeBand + "）がちょうどよく、" + r.carryNote + "。";
+  if (r.notes.length) note += " " + r.notes.join(" ");
+  document.getElementById("verdict-note").textContent = note;
+  document.getElementById("midCap").textContent = fmt(r.mid) + "L";
+  document.getElementById("baseCap").textContent = fmt(r.base) + "L";
+  document.getElementById("seasonAdj").textContent = fmtSigned(r.seasonAdj);
+  document.getElementById("souvenirAdj").textContent = fmtSigned(r.souvenirAdj);
+  document.getElementById("sizeCall").textContent = r.sizeCall + "（" + r.sizeBand + "）";
+  document.getElementById("carryNote").textContent = r.carryNote;
+  document.getElementById("sizes").innerHTML = r.sizes.map(function(s){
+    return '<span class="chip">' + fmt(s) + "L</span>";
+  }).join("");
+  var b = checkBag(val("len"), val("wid"), val("dep"), val("route"));
+  if (!b.valid){
+    document.getElementById("volResult").textContent = "—";
+    document.getElementById("sumResult").textContent = "—";
+    document.getElementById("carryResult").textContent = "—";
+    document.getElementById("checkinResult").textContent = "—";
+    document.getElementById("check-note").textContent = "3辺のサイズを正しく入れてください。";
+  } else {
+    document.getElementById("volResult").textContent = "約" + fmt(b.volumeL) + "L";
+    document.getElementById("sumResult").textContent = fmt(b.sum) + "cm";
+    document.getElementById("carryResult").textContent =
+      b.carryOk ? "持ち込めます" : "持ち込めません（" + b.carryReasons.join("・") + "）";
+    document.getElementById("checkinResult").textContent = b.checkin;
+    document.getElementById("check-note").textContent =
+      "重さの上限は、手荷物と身の回り品の合計で大手" + (b.weight === "10kg" ? "10kg" : "7kg") +
+      "です。重さは別途量ってください。機内持ち込みのサイズは、各航空会社の最新の案内で搭乗前に確認してください。";
+  }
+}
+["nights","season","souvenir","len","wid","dep","route"].forEach(function(id){
+  document.getElementById(id).addEventListener("input", calc);
+  document.getElementById(id).addEventListener("change", calc);
+});
+calc();
+</script>
+</body>
+</html>
